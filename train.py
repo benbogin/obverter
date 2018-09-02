@@ -12,7 +12,7 @@ plt.switch_backend('agg')
 
 parser = argparse.ArgumentParser(description='Emerging Language')
 
-parser.add_argument('--lr', type=float, default=2e-3, help='learning rate')
+parser.add_argument('--lr', type=float, default=6e-4, help='learning rate')
 parser.add_argument('--batch_size', type=int, default=50, help='number of images in a batch')
 parser.add_argument('--num_rounds', type=int, default=20000, help='number of total training rounds')
 parser.add_argument('--num_games_per_round', type=int, default=20, help='number of games per round')
