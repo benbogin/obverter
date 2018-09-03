@@ -75,8 +75,8 @@ def train_game(speaker, listener, batches, optimizer, max_sentence_len, vocab_si
             print("message: '%s', speaker object: %s, speaker score: %.2f, listener object: %s, label: %d, listener score: %.2f" %
                   (message, speaker_object, speaker_prob, listener_object, label.item(), listener_prob.item()))
 
-        print("accuracy", n_correct.item() / len(input1))
-        print("listener_loss", listener_loss.item())
+        print("batch accuracy", n_correct.item() / len(input1))
+        print("batch loss", listener_loss.item())
 
         game_correct += n_correct
         game_total += len(input1)
@@ -95,14 +95,22 @@ agent1_message_length_history = []
 agent1_loss_history = []
 
 os.makedirs('checkpoints', exist_ok=True)
+
+
+def print_game_stats(acc, sl, loss):
+    print("*******")
+    print("Game average accuracy: %.2f" % (acc * 100))
+    print("Game average sentence length: %.1f" % sl)
+    print("Game average loss: %.1f" % loss)
+    print("*******")
+
+
 for round in range(args.num_rounds):
     print("********** round %d **********" % round)
     batches = get_batches(images_dict, args.data_n_samples, args.num_games_per_round, args.batch_size)
 
     game_accuracy, game_loss, game_sentence_length = train_game(agent1, agent2, batches, optimizer2, args.max_sentence_len, args.vocab_size)
-    print("Game accuracy: %.2f" % (game_accuracy * 100))
-    print("Average sentence length: %.1f" % game_sentence_length)
-    print("Loss: %.1f" % game_loss)
+    print_game_stats(game_accuracy, game_loss, game_sentence_length)
 
     agent1_accuracy_history.append(game_accuracy)
     agent1_message_length_history.append(game_sentence_length / 20)
@@ -113,9 +121,7 @@ for round in range(args.num_rounds):
     print("********** round %d **********" % round)
 
     game_accuracy, game_loss, game_sentence_length = train_game(agent2, agent1, batches, optimizer1, args.max_sentence_len, args.vocab_size)
-    print("Game accuracy: %.2f" % (game_accuracy * 100))
-    print("Average sentence length: %.1f" % game_sentence_length)
-    print("Loss: %.1f" % game_loss)
+    print_game_stats(game_accuracy, game_loss, game_sentence_length)
 
     if round % 50 == 0:
         t = list(range(len(agent1_accuracy_history)))
