@@ -138,7 +138,7 @@ Round average loss: 0.1
 
 ### Differences from paper
 
-This repository was written with the intention to as close as possible to the paper's described methods.
+This repository was written with the intention to be as close as possible to the paper's described methods.
 
 Two differences are known:
 
