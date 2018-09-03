@@ -125,12 +125,12 @@ message: 'ea', speaker object: ('box', 'white'), speaker score: 0.96, listener o
 message: 'ed', speaker object: ('torus', 'gray'), speaker score: 0.96, listener object: ('box', 'white'), label: 0, listener score: 0.92
 message: 'bee', speaker object: ('sphere', 'gray'), speaker score: 0.97, listener object: ('cylinder', 'white'), label: 0, listener score: 0.00
 message: 'ed', speaker object: ('torus', 'gray'), speaker score: 0.96, listener object: ('cylinder', 'gray'), label: 0, listener score: 0.00
-batch round accuracy 0.96
+batch accuracy 0.96
 batch loss 0.09183049947023392
 *******
-Game average accuracy: 96.90
-Game average sentence length: 2.6
-Game average loss: 0.1
+Round average accuracy: 96.90
+Round average sentence length: 2.6
+Round average loss: 0.1
 ```
 
 ![graph](https://user-images.githubusercontent.com/2988446/44970524-cb728e80-af5a-11e8-8ee4-49fa1034917a.png)

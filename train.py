@@ -40,14 +40,14 @@ def get_message(s):
     return ''.join([chr(97+int(v.cpu().data)) for v in s if v < args.vocab_size])
 
 
-def train_game(speaker, listener, batches, optimizer, max_sentence_len, vocab_size):
+def train_round(speaker, listener, batches, optimizer, max_sentence_len, vocab_size):
     speaker.train(False)
     listener.train(True)
 
-    game_total = 0
-    game_correct = 0
-    game_loss = 0
-    game_sentence_length = 0
+    round_total = 0
+    round_correct = 0
+    round_loss = 0
+    round_sentence_length = 0
 
     for batch in batches:
         input1, input2, labels, descriptions = batch
@@ -78,16 +78,16 @@ def train_game(speaker, listener, batches, optimizer, max_sentence_len, vocab_si
         print("batch accuracy", n_correct.item() / len(input1))
         print("batch loss", listener_loss.item())
 
-        game_correct += n_correct
-        game_total += len(input1)
-        game_loss += listener_loss * len(input1)
-        game_sentence_length += (speaker_actions < vocab_size).sum(dim=1).float().mean() * len(input1)
+        round_correct += n_correct
+        round_total += len(input1)
+        round_loss += listener_loss * len(input1)
+        round_sentence_length += (speaker_actions < vocab_size).sum(dim=1).float().mean() * len(input1)
 
-    game_accuracy = (game_correct / game_total).item()
-    game_loss = (game_loss / game_total).item()
-    game_sentence_length = (game_sentence_length / game_total).item()
+    round_accuracy = (round_correct / round_total).item()
+    round_loss = (round_loss / round_total).item()
+    round_sentence_length = (round_sentence_length / round_total).item()
 
-    return game_accuracy, game_loss, game_sentence_length
+    return round_accuracy, round_loss, round_sentence_length
 
 
 agent1_accuracy_history = []
@@ -97,11 +97,11 @@ agent1_loss_history = []
 os.makedirs('checkpoints', exist_ok=True)
 
 
-def print_game_stats(acc, sl, loss):
+def print_round_stats(acc, sl, loss):
     print("*******")
-    print("Game average accuracy: %.2f" % (acc * 100))
-    print("Game average sentence length: %.1f" % sl)
-    print("Game average loss: %.1f" % loss)
+    print("Round average accuracy: %.2f" % (acc * 100))
+    print("Round average sentence length: %.1f" % sl)
+    print("Round average loss: %.1f" % loss)
     print("*******")
 
 
@@ -109,19 +109,19 @@ for round in range(args.num_rounds):
     print("********** round %d **********" % round)
     batches = get_batches(images_dict, args.data_n_samples, args.num_games_per_round, args.batch_size)
 
-    game_accuracy, game_loss, game_sentence_length = train_game(agent1, agent2, batches, optimizer2, args.max_sentence_len, args.vocab_size)
-    print_game_stats(game_accuracy, game_loss, game_sentence_length)
+    round_accuracy, round_loss, round_sentence_length = train_round(agent1, agent2, batches, optimizer2, args.max_sentence_len, args.vocab_size)
+    print_round_stats(round_accuracy, round_loss, round_sentence_length)
 
-    agent1_accuracy_history.append(game_accuracy)
-    agent1_message_length_history.append(game_sentence_length / 20)
-    agent1_loss_history.append(game_loss)
+    agent1_accuracy_history.append(round_accuracy)
+    agent1_message_length_history.append(round_sentence_length / 20)
+    agent1_loss_history.append(round_loss)
 
     round += 1
     print("replacing roles")
     print("********** round %d **********" % round)
 
-    game_accuracy, game_loss, game_sentence_length = train_game(agent2, agent1, batches, optimizer1, args.max_sentence_len, args.vocab_size)
-    print_game_stats(game_accuracy, game_loss, game_sentence_length)
+    round_accuracy, round_loss, round_sentence_length = train_round(agent2, agent1, batches, optimizer1, args.max_sentence_len, args.vocab_size)
+    print_round_stats(round_accuracy, round_loss, round_sentence_length)
 
     if round % 50 == 0:
         t = list(range(len(agent1_accuracy_history)))
@@ -129,7 +129,7 @@ for round in range(args.num_rounds):
         plt.plot(t, agent1_message_length_history, label="Message length (/20)")
         plt.plot(t, agent1_loss_history, label="Training loss")
 
-        plt.xlabel('# Game')
+        plt.xlabel('# Rounds')
         plt.legend()
         plt.savefig("graph.png")
         plt.clf()
